@@ -1,0 +1,10 @@
+services:
+  - type: cron
+    name: jam-score-job
+    schedule: "0 13 * * 1-5"  # 9:00 AM Eastern (UTC+0 = 13:00)
+    envVars:
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+    plan: free
+    buildCommand: ""
+    startCommand: "python jam.py"
