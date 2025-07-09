@@ -1,0 +1,7 @@
+Logged to CSV.
+Jam Score: 92.0%
+Travel time: 9.78 minutes
+Logged to CSV.
+Script ran at 2025-07-09 13:28:02.812086
+Jam Score: 90.5%
+Travel time: 9.95 minutes
