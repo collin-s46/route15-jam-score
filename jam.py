@@ -67,8 +67,39 @@ except FileNotFoundError:
 # Save it back
 df.to_csv(csv_path, index=False)
 
+
+import gspread
+from google.oauth2.service_account import Credentials
+import json
+
+# Read service account JSON from environment
+key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+
+# Set up credentials and Sheets client
+scope = ["https://www.googleapis.com/auth/spreadsheets"]
+creds = Credentials.from_service_account_info(key_dict, scopes=scope)
+client = gspread.authorize(creds)
+
+# Open your sheet and tab
+sheet = client.open("Route 15 Jam Log").worksheet("Log")
+
+# Format row
+from datetime import datetime
+now = datetime.now()
+date_str = now.strftime("%Y-%m-%d")
+day_str = now.strftime("%A")  # Monday, Tuesday, etc.
+
+# Add the row to your Google Sheet
+sheet.append_row([date_str, day_str, round(jam_score, 1), round(travel_time_min, 2)])
+print("✅ Logged to Google Sheets")
+
+
+
+
+
+
+
 print("Logged to CSV.")
-print(f"Script ran at {datetime.now()}")
 
 
 print(f"Jam Score: {jam_score:.1f}%")
