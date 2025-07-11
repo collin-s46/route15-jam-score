@@ -90,7 +90,10 @@ print("Attemping to log to Google Sheets...")
 key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
 
 # Set up credentials and Sheets client
-scope = ["https://www.googleapis.com/auth/spreadsheets"]
+scope = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
 creds = Credentials.from_service_account_info(key_dict, scopes=scope)
 client = gspread.authorize(creds)
 
