@@ -68,6 +68,19 @@ except FileNotFoundError:
 df.to_csv(csv_path, index=False)
 
 
+
+print("Logged to CSV.")
+
+
+print(f"Jam Score: {jam_score:.1f}%")
+
+
+print(f"Travel time: {travel_time_min:.2f} minutes")
+
+
+#sheets
+print("Attemping to log to Google Sheets...")
+
 import gspread
 from google.oauth2.service_account import Credentials
 import json
@@ -93,16 +106,3 @@ day_str = now.strftime("%A")  # Monday, Tuesday, etc.
 sheet.append_row([date_str, day_str, round(jam_score, 1), round(travel_time_min, 2)])
 print("✅ Logged to Google Sheets")
 
-
-
-
-
-
-
-print("Logged to CSV.")
-
-
-print(f"Jam Score: {jam_score:.1f}%")
-
-
-print(f"Travel time: {travel_time_min:.2f} minutes")
