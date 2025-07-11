@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 import requests
 import pandas as pd
 from datetime import datetime
+import gspread
+from google.oauth2.service_account import Credentials
+import json
 
 # Load environment variables from the .env file in the current directory
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
@@ -81,9 +84,7 @@ print(f"Travel time: {travel_time_min:.2f} minutes")
 #sheets
 print("Attemping to log to Google Sheets...")
 
-import gspread
-from google.oauth2.service_account import Credentials
-import json
+
 
 # Read service account JSON from environment
 key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
