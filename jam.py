@@ -6,6 +6,7 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 import json
+import pytz
 
 # Load environment variables from the .env file in the current directory
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
@@ -101,8 +102,8 @@ client = gspread.authorize(creds)
 sheet = client.open("Route 15 Jam Log").worksheet("Log")
 
 # Format row
-from datetime import datetime
-now = datetime.now()
+eastern = pytz.timezone("US/Eastern")
+now = datetime.now(eastern)
 date_str = now.strftime("%Y-%m-%d")
 day_str = now.strftime("%A")  # Monday, Tuesday, etc.
 
