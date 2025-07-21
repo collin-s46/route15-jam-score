@@ -32,7 +32,7 @@ client = gspread.authorize(creds)
 sheet = client.open("Route 15 Jam Log").worksheet("Log")
 
 # Prepare for loop
-departure_times = ["08:40", "08:50", "09:00", "09:05"]
+departure_times = ["20:59", "21:00", "21:01", "21:02"]
 eastern = pytz.timezone("US/Eastern")
 now = datetime.now(eastern)
 today_date = now.strftime("%Y-%m-%d")
