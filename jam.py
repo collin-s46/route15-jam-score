@@ -33,17 +33,26 @@ sheet = client.open("Route 15 Jam Log").worksheet("Log")
 
 # Prepare for loop
 eastern = pytz.timezone("US/Eastern")
+
+# Step 1: Get departure time from env variable (required)
+departure_time_str = os.getenv("DEPARTURE_TIME", None)
+if not departure_time_str:
+    raise ValueError("DEPARTURE_TIME environment variable not set.")
+
+# Use today's date in US/Eastern timezone
 now = datetime.now(eastern)
-today_date = now.strftime("%Y-%m-%d")
-today_day = now.strftime("%A")
+today = now.date()
+
+# Build departure datetime in US/Eastern
+try:
+    departure_dt_naive = datetime.strptime(f"{today} {departure_time_str}", "%Y-%m-%d %H:%M")
+except ValueError:
+    raise ValueError(f"DEPARTURE_TIME format invalid: '{departure_time_str}'. Use HH:MM (e.g., 08:30)")
+
+departure_dt = eastern.localize(departure_dt_naive)
+departure_unix = int(departure_dt.timestamp())
 
 url = "https://maps.googleapis.com/maps/api/distancematrix/json"
-
-departure_time = os.getenv("DEPARTURE_TIME", "08:30")  # Default to 08:30 if not set
-
-hour, minute = map(int, departure_time.split(":"))
-departure_dt = eastern.localize(datetime(now.year, now.month, now.day, hour, minute))
-departure_unix = int(departure_dt.timestamp())
 
 # Build the request URL for this departure time
 params = {
@@ -64,9 +73,9 @@ try:
 
     # Log to Google Sheets (columns: Date | Day | Departure Time | Jam Score | Travel Time)
     sheet.append_row([
-        today_date,
-        today_day,
-        departure_time,
+        departure_time.date().isoformat(),
+        departure_time.strftime("%A"),
+        departure_time.strftime("%H:%M"),
         round(jam_score, 1),
         round(travel_time_min, 2)
     ])
