@@ -39,6 +39,9 @@ departure_time_str = os.getenv("DEPARTURE_TIME", None)
 if not departure_time_str:
     raise ValueError("DEPARTURE_TIME environment variable not set.")
 
+departure_time = datetime.strptime(departure_time_str, "%H:%M")
+
+
 # Use today's date in US/Eastern timezone
 now = datetime.now(eastern)
 today = now.date()
@@ -82,6 +85,6 @@ try:
     print(f"✅ Logged to Google Sheets for {departure_time}")
 
 except Exception as e:
-    print(f"API error for {departure_time}:", e)
+    print(f"API error for {departure_time_str}:", e)
 
 
