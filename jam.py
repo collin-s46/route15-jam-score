@@ -74,15 +74,20 @@ try:
     jam_score = (baseline_time / travel_time_min) * 100
     jam_score = min(jam_score, 100)
 
+    # Get current date and combine with departure time
+    now = datetime.now()
+    departure_dt = datetime.strptime(departure_time.strftime("%H:%M"), "%H:%M")
+    full_departure_datetime = now.replace(hour=departure_dt.hour, minute=departure_dt.minute, second=0, microsecond=0)
+
     # Log to Google Sheets (columns: Date | Day | Departure Time | Jam Score | Travel Time)
     sheet.append_row([
-        departure_time.date().isoformat(),
-        departure_time.strftime("%A"),
-        departure_time.strftime("%H:%M"),
+        full_departure_datetime.strftime("%Y-%m-%d"),
+        full_departure_datetime.strftime("%A"),
+        full_departure_datetime.strftime("%H:%M"),
         round(jam_score, 1),
         round(travel_time_min, 2)
     ])
-    print(f"✅ Logged to Google Sheets for {departure_time}")
+    print(f"✅ Logged to Google Sheets for {departure_time_str}")
 
 except Exception as e:
     print(f"API error for {departure_time_str}:", e)
