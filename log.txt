@@ -5,3 +5,65 @@ Logged to CSV.
 Script ran at 2025-07-09 13:28:02.812086
 Jam Score: 90.5%
 Travel time: 9.95 minutes
+/home/collin-s46/.local/lib/python3.10/site-packages/dotenv/main.py:14: UserWarning: Not loading /home/collin-s46/Desktop/VsCode/route15-jam-score/.env - it doesn't exist.
+  warnings.warn("Not loading %s - it doesn't exist." % dotenv_path)
+Traceback (most recent call last):
+  File "/home/collin-s46/Desktop/VsCode/route15-jam-score/jam.py", line 30, in <module>
+    travel_time_sec = data["rows"][0]["elements"][0]["duration_in_traffic"]["value"]
+IndexError: list index out of range
+/home/collin-s46/.local/lib/python3.10/site-packages/dotenv/main.py:14: UserWarning: Not loading /home/collin-s46/Desktop/VsCode/route15-jam-score/.env - it doesn't exist.
+  warnings.warn("Not loading %s - it doesn't exist." % dotenv_path)
+Traceback (most recent call last):
+  File "/home/collin-s46/Desktop/VsCode/route15-jam-score/jam.py", line 21, in <module>
+    key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+  File "/usr/lib/python3.10/os.py", line 680, in __getitem__
+    raise KeyError(key) from None
+KeyError: 'SERVICE_ACCOUNT_JSON'
+/home/collin-s46/.local/lib/python3.10/site-packages/dotenv/main.py:14: UserWarning: Not loading /home/collin-s46/Desktop/VsCode/route15-jam-score/.env - it doesn't exist.
+  warnings.warn("Not loading %s - it doesn't exist." % dotenv_path)
+Traceback (most recent call last):
+  File "/home/collin-s46/Desktop/VsCode/route15-jam-score/jam.py", line 21, in <module>
+    key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+  File "/usr/lib/python3.10/os.py", line 680, in __getitem__
+    raise KeyError(key) from None
+KeyError: 'SERVICE_ACCOUNT_JSON'
+/home/collin-s46/.local/lib/python3.10/site-packages/dotenv/main.py:14: UserWarning: Not loading /home/collin-s46/Desktop/VsCode/route15-jam-score/.env - it doesn't exist.
+  warnings.warn("Not loading %s - it doesn't exist." % dotenv_path)
+Traceback (most recent call last):
+  File "/home/collin-s46/Desktop/VsCode/route15-jam-score/jam.py", line 21, in <module>
+    key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+  File "/usr/lib/python3.10/os.py", line 680, in __getitem__
+    raise KeyError(key) from None
+KeyError: 'SERVICE_ACCOUNT_JSON'
+/home/collin-s46/.local/lib/python3.10/site-packages/dotenv/main.py:14: UserWarning: Not loading /home/collin-s46/Desktop/VsCode/route15-jam-score/.env - it doesn't exist.
+  warnings.warn("Not loading %s - it doesn't exist." % dotenv_path)
+Traceback (most recent call last):
+  File "/home/collin-s46/Desktop/VsCode/route15-jam-score/jam.py", line 21, in <module>
+    key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+  File "/usr/lib/python3.10/os.py", line 680, in __getitem__
+    raise KeyError(key) from None
+KeyError: 'SERVICE_ACCOUNT_JSON'
+/home/collin-s46/.local/lib/python3.10/site-packages/dotenv/main.py:14: UserWarning: Not loading /home/collin-s46/Desktop/VsCode/route15-jam-score/.env - it doesn't exist.
+  warnings.warn("Not loading %s - it doesn't exist." % dotenv_path)
+Traceback (most recent call last):
+  File "/home/collin-s46/Desktop/VsCode/route15-jam-score/jam.py", line 21, in <module>
+    key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+  File "/usr/lib/python3.10/os.py", line 680, in __getitem__
+    raise KeyError(key) from None
+KeyError: 'SERVICE_ACCOUNT_JSON'
+/home/collin-s46/.local/lib/python3.10/site-packages/dotenv/main.py:14: UserWarning: Not loading /home/collin-s46/Desktop/VsCode/route15-jam-score/.env - it doesn't exist.
+  warnings.warn("Not loading %s - it doesn't exist." % dotenv_path)
+Traceback (most recent call last):
+  File "/home/collin-s46/Desktop/VsCode/route15-jam-score/jam.py", line 21, in <module>
+    key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+  File "/usr/lib/python3.10/os.py", line 680, in __getitem__
+    raise KeyError(key) from None
+KeyError: 'SERVICE_ACCOUNT_JSON'
+/home/collin-s46/.local/lib/python3.10/site-packages/dotenv/main.py:14: UserWarning: Not loading /home/collin-s46/Desktop/VsCode/route15-jam-score/.env - it doesn't exist.
+  warnings.warn("Not loading %s - it doesn't exist." % dotenv_path)
+Traceback (most recent call last):
+  File "/home/collin-s46/Desktop/VsCode/route15-jam-score/jam.py", line 21, in <module>
+    key_dict = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
+  File "/usr/lib/python3.10/os.py", line 680, in __getitem__
+    raise KeyError(key) from None
+KeyError: 'SERVICE_ACCOUNT_JSON'
