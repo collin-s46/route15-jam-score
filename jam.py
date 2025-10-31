@@ -1,32 +1,46 @@
 import os
 import json
 import requests
-import pandas as pd
 from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 import pytz
 
 # --------------------------
-# Load service account and config from local JSON
+# Load SERVICE_ACCOUNT_JSON
 # --------------------------
-local_file = "route15-logger.json"
+service_account_json = os.environ.get("SERVICE_ACCOUNT_JSON")
 
-try:
-    with open(local_file) as f:
-        key_dict = json.load(f)
-    print(f"✅ Loaded SERVICE_ACCOUNT_JSON from local file: {local_file}")
-except FileNotFoundError:
-    raise RuntimeError(f"❌ No SERVICE_ACCOUNT_JSON found. Please create {local_file}")
+if service_account_json:
+    key_dict = json.loads(service_account_json)
+    print("✅ Loaded SERVICE_ACCOUNT_JSON from environment variable.")
+else:
+    # Only fallback to local JSON if it exists (for local testing)
+    local_file = "route15-logger.json"
+    if os.path.exists(local_file):
+        with open(local_file) as f:
+            key_dict = json.load(f)
+        print(f"✅ Loaded SERVICE_ACCOUNT_JSON from local file: {local_file}")
+    else:
+        raise RuntimeError(
+            "❌ SERVICE_ACCOUNT_JSON not found. "
+            "Set it as an environment variable (Render) or create route15-logger.json for local testing."
+        )
 
-# If your JSON contains DEPARTURE_TIME, read it
-departure_time_str = key_dict.get("DEPARTURE_TIME", "08:30")  # default 08:30 if not set
+# --------------------------
+# Load DEPARTURE_TIME
+# --------------------------
+departure_time_str = os.environ.get("DEPARTURE_TIME") or key_dict.get("DEPARTURE_TIME")
+if not departure_time_str:
+    departure_time_str = "08:30"  # fallback default for local testing
 print(f"✅ Using departure time: {departure_time_str}")
 
-# Google Maps API key (optional: put in your JSON or set as env variable)
-API_KEY = key_dict.get("GOOGLE_MAPS_API_KEY") or os.getenv("GOOGLE_MAPS_API_KEY")
+# --------------------------
+# Load GOOGLE_MAPS_API_KEY
+# --------------------------
+API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY") or key_dict.get("GOOGLE_MAPS_API_KEY")
 if not API_KEY:
-    raise RuntimeError("❌ GOOGLE_MAPS_API_KEY not set in JSON or environment variable.")
+    raise RuntimeError("❌ GOOGLE_MAPS_API_KEY not set in env variables or JSON.")
 
 # --------------------------
 # Google Sheets setup
@@ -41,7 +55,7 @@ client = gspread.authorize(creds)
 sheet = client.open("Route 15 Jam Log").worksheet("Log")
 
 # --------------------------
-# Define trip info
+# Trip info
 # --------------------------
 origin = "15783 Dorneywood Dr, Leesburg, VA 20176"
 destination = "801 N King St, Leesburg, VA 20176"
