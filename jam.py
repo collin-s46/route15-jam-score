@@ -1,68 +1,51 @@
 import os
-import json
+from dotenv import load_dotenv
 import requests
+import pandas as pd
 from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
+import json
 import pytz
+import smtplib
+from email.mime.text import MIMEText
 
-# --------------------------
-# Load SERVICE_ACCOUNT_JSON
-# --------------------------
+# Load environment variables
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+
+# 1. Load Google service account JSON
 service_account_json = os.environ.get("SERVICE_ACCOUNT_JSON")
-
 if service_account_json:
     key_dict = json.loads(service_account_json)
     print("✅ Loaded SERVICE_ACCOUNT_JSON from environment variable.")
 else:
-    # Only fallback to local JSON if it exists (for local testing)
     local_file = "route15-logger.json"
-    if os.path.exists(local_file):
+    try:
         with open(local_file) as f:
             key_dict = json.load(f)
         print(f"✅ Loaded SERVICE_ACCOUNT_JSON from local file: {local_file}")
-    else:
-        raise RuntimeError(
-            "❌ SERVICE_ACCOUNT_JSON not found. "
-            "Set it as an environment variable (Render) or create route15-logger.json for local testing."
-        )
+    except FileNotFoundError:
+        raise RuntimeError(f"❌ No SERVICE_ACCOUNT_JSON found. Please set env var or create {local_file}")
 
-# --------------------------
-# Load DEPARTURE_TIME
-# --------------------------
-departure_time_str = os.environ.get("DEPARTURE_TIME") or key_dict.get("DEPARTURE_TIME")
-if not departure_time_str:
-    departure_time_str = "08:30"  # fallback default for local testing
-print(f"✅ Using departure time: {departure_time_str}")
-
-# --------------------------
-# Load GOOGLE_MAPS_API_KEY
-# --------------------------
-API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY") or key_dict.get("GOOGLE_MAPS_API_KEY")
-if not API_KEY:
-    raise RuntimeError("❌ GOOGLE_MAPS_API_KEY not set in env variables or JSON.")
-
-# --------------------------
-# Google Sheets setup
-# --------------------------
-scope = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"
-]
+# 2. API Key and Sheet setup
+API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 creds = Credentials.from_service_account_info(key_dict, scopes=scope)
 client = gspread.authorize(creds)
-
 sheet = client.open("Route 15 Jam Log").worksheet("Log")
 
-# --------------------------
-# Trip info
-# --------------------------
+# 3. Route info
 origin = "15783 Dorneywood Dr, Leesburg, VA 20176"
 destination = "801 N King St, Leesburg, VA 20176"
-eastern = pytz.timezone("US/Eastern")
 
-# Build departure datetime
-today = datetime.now(eastern).date()
+# 4. Departure time
+departure_time_str = os.getenv("DEPARTURE_TIME", None)
+if not departure_time_str:
+    raise ValueError("DEPARTURE_TIME environment variable not set.")
+eastern = pytz.timezone("US/Eastern")
+now = datetime.now(eastern)
+today = now.date()
+
 try:
     departure_dt_naive = datetime.strptime(f"{today} {departure_time_str}", "%Y-%m-%d %H:%M")
 except ValueError:
@@ -71,9 +54,7 @@ except ValueError:
 departure_dt = eastern.localize(departure_dt_naive)
 departure_unix = int(departure_dt.timestamp())
 
-# --------------------------
-# Call Google Maps API
-# --------------------------
+# 5. Call Google Maps API
 url = "https://maps.googleapis.com/maps/api/distancematrix/json"
 params = {
     "origins": origin,
@@ -85,9 +66,6 @@ response = requests.get(url, params=params)
 data = response.json()
 print("Full API response:", data)
 
-# --------------------------
-# Calculate jam score and log to Sheets
-# --------------------------
 try:
     travel_time_sec = data["rows"][0]["elements"][0]["duration_in_traffic"]["value"]
     travel_time_min = travel_time_sec / 60
@@ -95,18 +73,38 @@ try:
     jam_score = (baseline_time / travel_time_min) * 100
     jam_score = min(jam_score, 100)
 
-    # Combine date with departure time
-    full_departure_datetime = departure_dt
-
-    # Append row to Google Sheet: Date | Day | Departure Time | Jam Score | Travel Time
+    # Log to Google Sheets
     sheet.append_row([
-        full_departure_datetime.strftime("%Y-%m-%d"),
-        full_departure_datetime.strftime("%A"),
-        full_departure_datetime.strftime("%H:%M"),
+        now.strftime("%Y-%m-%d"),
+        now.strftime("%A"),
+        departure_time_str,
         round(jam_score, 1),
         round(travel_time_min, 2)
     ])
-    print(f"✅ Logged to Google Sheets for {departure_time_str}")
+    print(f"✅ Logged {departure_time_str} successfully")
+
+    # 6. Send email notification (only at 8:40)
+    if departure_time_str == "08:40":
+        records = sheet.get_all_records()
+        last_two = records[-2:]  # Get last 2 rows
+
+        msg_body = "Route 15 Traffic Update:\n\n"
+        for row in last_two:
+            msg_body += f"{row['Departure Time']} -- Travel Time: {row['Travel Time']} - Jam Score: {row['Jam Score']}\n"
+
+        sender = os.getenv("GMAIL_ADDRESS")
+        password = os.getenv("GMAIL_APP_PASSWORD")
+        recipient = sender
+
+        msg = MIMEText(msg_body)
+        msg["Subject"] = f"Route 15 Jam Scores ({now.strftime('%A')})"
+        msg["From"] = sender
+        msg["To"] = recipient
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(sender, password)
+            server.send_message(msg)
+        print("📧 Email sent with latest jam scores.")
 
 except Exception as e:
-    print(f"API error for {departure_time_str}:", e)
+    print(f"API or Sheet error for {departure_time_str}:", e)
