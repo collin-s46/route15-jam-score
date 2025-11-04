@@ -90,7 +90,7 @@ try:
 
         msg_body = "Route 15 Traffic Update:\n\n"
         for row in last_two:
-            msg_body += f"{row['Departure Time']} -- Travel Time: {row['Travel Time']} - Jam Score: {row['Jam Score']}\n"
+            msg_body += f"{row['Departure']} -- Travel Time: {row['Travel Time']} - Jam Score: {row['Jam Score']}\n"
 
         sender = os.getenv("GMAIL_ADDRESS")
         password = os.getenv("GMAIL_APP_PASSWORD")
