@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 # Read CSV file
-df = pd.read_csv('traffic_data280.csv', index_col='Date')
+df = pd.read_csv('traffic_data.csv', index_col='Date')
 
 plt.figure(figsize=(10, 6))
 
