@@ -35,3 +35,15 @@ python create_447_visualizations.py
 All graphs are saved in:
 
 - `447_visualizations/`
+
+## Simple website dashboard
+
+Run a local static server:
+
+```bash
+python -m http.server 8000
+```
+
+Then open:
+
+- `http://localhost:8000/index.html`

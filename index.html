@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Route 15 Jam Score Dashboard</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .container {
+      width: min(1200px, 92vw);
+      margin: 0 auto;
+      padding: 2rem 0 3rem;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #fff;
+      border-radius: 14px;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.5rem, 2.3vw, 2.2rem);
+      line-height: 1.2;
+    }
+
+    .hero p {
+      margin: 0 auto;
+      max-width: 70ch;
+      color: #e5edff;
+      font-size: 1rem;
+    }
+
+    .section-title {
+      margin: 1.4rem 0 0.7rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .muted { color: var(--muted); }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem 0.95rem;
+    }
+
+    .card .label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .card .value {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 0.85rem;
+      margin-top: 0.8rem;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.9rem;
+      overflow: hidden;
+    }
+
+    .panel h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+    }
+
+    .panel img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.45rem 0.3rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th { color: var(--muted); font-weight: 600; }
+
+    .status {
+      margin-top: 0.7rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: #12326d;
+      font-size: 0.9rem;
+      border: 1px solid #bfdbfe;
+    }
+
+    @media (max-width: 640px) {
+      th, td { font-size: 0.84rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>Route 15 Jam Score Dashboard</h1>
+      <p>
+        A personal dashboard tracking morning commute traffic on Route 15 — the road I drive every day — using real trip data I collected myself.
+        By turning each drive into travel-time and jam-score insights, I can clearly see the best and worst times to leave each morning.
+      </p>
+    </section>
+
+    <h2 class="section-title">Overview</h2>
+    <section class="cards" id="kpi-cards">
+      <article class="card"><div class="label">Total Records</div><div class="value" id="kpi-records">-</div></article>
+      <article class="card"><div class="label">Date Range</div><div class="value" id="kpi-range">-</div></article>
+      <article class="card"><div class="label">Avg Travel Time</div><div class="value" id="kpi-avg-travel">-</div></article>
+      <article class="card"><div class="label">Avg Jam Score</div><div class="value" id="kpi-avg-jam">-</div></article>
+      <article class="card"><div class="label">Best Departure Slot</div><div class="value" id="kpi-best-slot">-</div></article>
+      <article class="card"><div class="label">Outlier Points</div><div class="value" id="kpi-outliers">-</div></article>
+    </section>
+
+    <div class="status" id="status">Loading data and building dashboard...</div>
+
+    <h2 class="section-title">Visualization Gallery</h2>
+    <section class="panel-grid">
+      <article class="panel">
+        <h3>Travel Time Trend</h3>
+        <img src="447_visualizations/01_travel_time_trend.png" alt="Travel time trend">
+      </article>
+      <article class="panel">
+        <h3>Day x Departure Heatmap</h3>
+        <img src="447_visualizations/02_day_departure_heatmap.png" alt="Day and departure heatmap">
+      </article>
+      <article class="panel">
+        <h3>Jam Score vs Travel Time</h3>
+        <img src="447_visualizations/03_jam_score_vs_travel_time.png" alt="Jam score versus travel time">
+      </article>
+      <article class="panel">
+        <h3>Travel Time Distribution by Day</h3>
+        <img src="447_visualizations/04_travel_time_boxplot_by_day.png" alt="Travel time boxplot by day">
+      </article>
+      <article class="panel">
+        <h3>Departure Profile</h3>
+        <img src="447_visualizations/05_departure_profile_dual_axis.png" alt="Departure profile dual axis">
+      </article>
+      <article class="panel">
+        <h3>Timeline with Outliers</h3>
+        <img src="447_visualizations/06_timeline_with_outliers.png" alt="Timeline with outliers">
+      </article>
+    </section>
+
+    <h2 class="section-title">Key Data Tables</h2>
+    <section class="panel-grid">
+      <article class="panel">
+        <h3>Most Congested Days (Top 8 by average travel time)</h3>
+        <table id="worst-days-table">
+          <thead>
+            <tr><th>Date</th><th>Day</th><th>Avg Travel (min)</th><th>Avg Jam Score</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </article>
+      <article class="panel">
+        <h3>Best Departure Windows (average across all dates)</h3>
+        <table id="best-slots-table">
+          <thead>
+            <tr><th>Departure</th><th>Avg Travel (min)</th><th>Avg Jam Score</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </article>
+      <article class="panel" style="grid-column: 1 / -1;">
+        <h3>Latest Commute Records</h3>
+        <table id="latest-records-table">
+          <thead>
+            <tr><th>Date</th><th>Day</th><th>Departure</th><th>Travel (min)</th><th>Jam Score</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const headers = lines[0].split(",");
+      return lines.slice(1).filter(Boolean).map((line) => {
+        const values = line.split(",");
+        const row = {};
+        headers.forEach((header, i) => {
+          row[header] = values[i] ?? "";
+        });
+        return row;
+      });
+    }
+
+    function avg(numbers) {
+      if (!numbers.length) return 0;
+      return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
+    }
+
+    function formatDate(dateStr) {
+      return new Date(dateStr + "T00:00:00").toLocaleDateString();
+    }
+
+    function toNumber(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function fillKpis(preparedRows) {
+      const dates = preparedRows.map((r) => r.date).sort();
+      const travel = preparedRows.map((r) => toNumber(r.travel_time_min));
+      const jam = preparedRows.map((r) => toNumber(r.jam_score));
+      const outliers = preparedRows.filter((r) => String(r.travel_time_outlier).toLowerCase() === "true").length;
+
+      const byDeparture = {};
+      preparedRows.forEach((r) => {
+        const dep = r.departure;
+        if (!byDeparture[dep]) byDeparture[dep] = [];
+        byDeparture[dep].push(toNumber(r.travel_time_min));
+      });
+      const bestSlot = Object.entries(byDeparture)
+        .map(([dep, values]) => [dep, avg(values)])
+        .sort((a, b) => a[1] - b[1])[0];
+
+      document.getElementById("kpi-records").textContent = preparedRows.length.toLocaleString();
+      document.getElementById("kpi-range").textContent = `${formatDate(dates[0])} - ${formatDate(dates[dates.length - 1])}`;
+      document.getElementById("kpi-avg-travel").textContent = `${avg(travel).toFixed(2)} min`;
+      document.getElementById("kpi-avg-jam").textContent = avg(jam).toFixed(1);
+      document.getElementById("kpi-best-slot").textContent = `${bestSlot[0]} (${bestSlot[1].toFixed(2)} min)`;
+      document.getElementById("kpi-outliers").textContent = outliers.toString();
+    }
+
+    function buildWorstDaysTable(dailyRows) {
+      const tbody = document.querySelector("#worst-days-table tbody");
+      tbody.innerHTML = "";
+      dailyRows
+        .sort((a, b) => toNumber(b.avg_travel_time_min) - toNumber(a.avg_travel_time_min))
+        .slice(0, 8)
+        .forEach((r) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${formatDate(r.date)}</td>
+            <td>${r.day}</td>
+            <td>${toNumber(r.avg_travel_time_min).toFixed(2)}</td>
+            <td>${toNumber(r.avg_jam_score).toFixed(1)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    function buildBestSlotsTable(preparedRows) {
+      const tbody = document.querySelector("#best-slots-table tbody");
+      tbody.innerHTML = "";
+      const bySlot = {};
+      preparedRows.forEach((r) => {
+        const dep = r.departure;
+        if (!bySlot[dep]) bySlot[dep] = { travel: [], jam: [] };
+        bySlot[dep].travel.push(toNumber(r.travel_time_min));
+        bySlot[dep].jam.push(toNumber(r.jam_score));
+      });
+      Object.entries(bySlot)
+        .map(([dep, values]) => ({ dep, travel: avg(values.travel), jam: avg(values.jam) }))
+        .sort((a, b) => a.travel - b.travel)
+        .forEach((r) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.dep}</td>
+            <td>${r.travel.toFixed(2)}</td>
+            <td>${r.jam.toFixed(1)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    function buildLatestTable(preparedRows) {
+      const tbody = document.querySelector("#latest-records-table tbody");
+      tbody.innerHTML = "";
+      preparedRows
+        .slice()
+        .sort((a, b) => `${b.date}-${b.departure}`.localeCompare(`${a.date}-${a.departure}`))
+        .slice(0, 12)
+        .forEach((r) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${formatDate(r.date)}</td>
+            <td>${r.day}</td>
+            <td>${r.departure}</td>
+            <td>${toNumber(r.travel_time_min).toFixed(2)}</td>
+            <td>${toNumber(r.jam_score).toFixed(1)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    async function init() {
+      const status = document.getElementById("status");
+      try {
+        const [preparedText, dailyText] = await Promise.all([
+          fetch("447_data_prepared.csv").then((r) => {
+            if (!r.ok) throw new Error("Could not load 447_data_prepared.csv");
+            return r.text();
+          }),
+          fetch("447_daily_summary.csv").then((r) => {
+            if (!r.ok) throw new Error("Could not load 447_daily_summary.csv");
+            return r.text();
+          }),
+        ]);
+
+        const preparedRows = parseCsv(preparedText);
+        const dailyRows = parseCsv(dailyText);
+
+        fillKpis(preparedRows);
+        buildWorstDaysTable(dailyRows);
+        buildBestSlotsTable(preparedRows);
+        buildLatestTable(preparedRows);
+        status.textContent = "Dashboard loaded from prepared commute datasets.";
+      } catch (error) {
+        status.textContent = "Could not load CSV files. Start a local server (for example: python -m http.server 8000) and open this page through http://localhost:8000/index.html.";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
